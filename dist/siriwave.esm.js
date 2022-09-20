@@ -257,15 +257,18 @@ class iOS9Curve {
 
 class SiriWave {
     constructor(_a) {
-        var { container } = _a, rest = __rest(_a, ["container"]);
+        // const csStyle = window.getComputedStyle(container);
+        var { canvas } = _a, rest = __rest(_a, ["canvas"]);
         // Phase of the wave (passed to Math.sin function)
         this.phase = 0;
         // Boolean value indicating the the animation is running
         this.run = false;
         // Curves objects to animate
         this.curves = [];
-        const csStyle = window.getComputedStyle(container);
-        this.opt = Object.assign({ container, style: "ios", ratio: window.devicePixelRatio || 1, speed: 0.2, amplitude: 1, frequency: 6, color: "#fff", cover: false, width: parseInt(csStyle.width.replace("px", ""), 10), height: parseInt(csStyle.height.replace("px", ""), 10), autostart: true, pixelDepth: 0.02, lerpSpeed: 0.1 }, rest);
+        this.opt = Object.assign({ canvas, style: "ios", ratio: 1, speed: 0.2, amplitude: 1, frequency: 6, color: "#fff", cover: false, 
+            // width: parseInt(csStyle.width.replace("px", ""), 10),
+            // height: parseInt(csStyle.height.replace("px", ""), 10),
+            autostart: true, pixelDepth: 0.02, lerpSpeed: 0.1 }, rest);
         /**
          * Actual speed of the animation. Is not safe to change this value directly, use `setSpeed` instead.
          */
@@ -301,7 +304,8 @@ class SiriWave {
         /**
          * Canvas DOM Element where curves will be drawn
          */
-        this.canvas = document.createElement("canvas");
+        // this.canvas = document.createElement("canvas");
+        this.canvas = canvas;
         /**
          * 2D Context from Canvas
          */
@@ -311,16 +315,15 @@ class SiriWave {
         }
         this.ctx = ctx;
         // Set dimensions
-        this.canvas.width = this.width;
-        this.canvas.height = this.height;
+        // this.canvas.width = this.width;
+        // this.canvas.height = this.height;
         // By covering, we ensure the canvas is in the same size of the parent
-        if (this.opt.cover === true) {
-            this.canvas.style.width = this.canvas.style.height = "100%";
-        }
-        else {
-            this.canvas.style.width = `${this.width / this.opt.ratio}px`;
-            this.canvas.style.height = `${this.height / this.opt.ratio}px`;
-        }
+        // if (this.opt.cover === true) {
+        //   this.canvas.style.width = this.canvas.style.height = "100%";
+        // } else {
+        //   this.canvas.style.width = `${this.width / this.opt.ratio!}px`;
+        //   this.canvas.style.height = `${this.height / this.opt.ratio!}px`;
+        // }
         // Instantiate all curves based on the style
         switch (this.opt.style) {
             case "ios9":
@@ -332,11 +335,11 @@ class SiriWave {
                 break;
         }
         // Attach to the container
-        this.opt.container.appendChild(this.canvas);
+        // this.opt.container.appendChild(this.canvas);
         // Start the animation
-        if (this.opt.autostart) {
-            this.start();
-        }
+        // if (this.opt.autostart) {
+        //   this.start();
+        // }
     }
     /**
      * Convert an HEX color to RGB
@@ -390,12 +393,20 @@ class SiriWave {
         this.lerp("speed");
         this.draw();
         this.phase = (this.phase + (Math.PI / 2) * this.speed) % (2 * Math.PI);
-        if (window.requestAnimationFrame) {
-            this.animationFrameId = window.requestAnimationFrame(this.startDrawCycle.bind(this));
-        }
-        else {
-            this.timeoutId = setTimeout(this.startDrawCycle.bind(this), 20);
-        }
+        // if (window.requestAnimationFrame) {
+        //   this.animationFrameId = window.requestAnimationFrame(this.startDrawCycle.bind(this));
+        // } else {
+        //   this.timeoutId = setTimeout(this.startDrawCycle.bind(this), 20);
+        // }
+    }
+    render(time) {
+        this.clear();
+        // Interpolate values
+        this.lerp("amplitude");
+        this.lerp("speed");
+        this.phase = (time * this.speed) % (2 * Math.PI);
+        console.log('render', this.phase);
+        this.draw();
     }
     /* API */
     /**
@@ -419,12 +430,12 @@ class SiriWave {
         this.phase = 0;
         this.run = false;
         // Clear old draw cycle on stop
-        if (this.animationFrameId) {
-            window.cancelAnimationFrame(this.animationFrameId);
-        }
-        if (this.timeoutId) {
-            clearTimeout(this.timeoutId);
-        }
+        // if (this.animationFrameId) {
+        //   window.cancelAnimationFrame(this.animationFrameId);
+        // }
+        // if (this.timeoutId) {
+        //   clearTimeout(this.timeoutId);
+        // }
     }
     /**
      * Dispose

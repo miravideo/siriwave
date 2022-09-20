@@ -1,6 +1,6 @@
 declare type CurveStyle = "ios" | "ios9";
 export declare type Options = {
-    container: HTMLElement;
+    canvas: HTMLCanvasElement;
     style?: CurveStyle;
     ratio?: number;
     speed?: number;
@@ -48,7 +48,7 @@ export default class SiriWave {
     ctx: CanvasRenderingContext2D;
     animationFrameId: number | undefined;
     timeoutId: ReturnType<typeof setTimeout> | undefined;
-    constructor({ container, ...rest }: Options);
+    constructor({ canvas, ...rest }: Options);
     /**
      * Convert an HEX color to RGB
      */
@@ -71,6 +71,7 @@ export default class SiriWave {
      * @returns
      */
     private startDrawCycle;
+    render(time: number): void;
     /**
      * Start the animation
      */

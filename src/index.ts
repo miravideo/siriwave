@@ -5,7 +5,7 @@ type CurveStyle = "ios" | "ios9";
 
 export type Options = {
   // The DOM container where the DOM canvas element will be added
-  container: HTMLElement;
+  canvas: HTMLCanvasElement;
   // The style of the wave: `ios` or `ios9`
   style?: CurveStyle;
   //  Ratio of the display to use. Calculated by default.
@@ -79,20 +79,20 @@ export default class SiriWave {
   animationFrameId: number | undefined;
   timeoutId: ReturnType<typeof setTimeout> | undefined;
 
-  constructor({ container, ...rest }: Options) {
-    const csStyle = window.getComputedStyle(container);
+  constructor({ canvas, ...rest }: Options) {
+    // const csStyle = window.getComputedStyle(container);
 
     this.opt = {
-      container,
+      canvas,
       style: "ios",
-      ratio: window.devicePixelRatio || 1,
+      ratio: 1,
       speed: 0.2,
       amplitude: 1,
       frequency: 6,
       color: "#fff",
       cover: false,
-      width: parseInt(csStyle.width.replace("px", ""), 10),
-      height: parseInt(csStyle.height.replace("px", ""), 10),
+      // width: parseInt(csStyle.width.replace("px", ""), 10),
+      // height: parseInt(csStyle.height.replace("px", ""), 10),
       autostart: true,
       pixelDepth: 0.02,
       lerpSpeed: 0.1,
@@ -141,7 +141,8 @@ export default class SiriWave {
     /**
      * Canvas DOM Element where curves will be drawn
      */
-    this.canvas = document.createElement("canvas");
+    // this.canvas = document.createElement("canvas");
+    this.canvas = canvas;
 
     /**
      * 2D Context from Canvas
@@ -153,16 +154,16 @@ export default class SiriWave {
     this.ctx = ctx;
 
     // Set dimensions
-    this.canvas.width = this.width;
-    this.canvas.height = this.height;
+    // this.canvas.width = this.width;
+    // this.canvas.height = this.height;
 
     // By covering, we ensure the canvas is in the same size of the parent
-    if (this.opt.cover === true) {
-      this.canvas.style.width = this.canvas.style.height = "100%";
-    } else {
-      this.canvas.style.width = `${this.width / this.opt.ratio!}px`;
-      this.canvas.style.height = `${this.height / this.opt.ratio!}px`;
-    }
+    // if (this.opt.cover === true) {
+    //   this.canvas.style.width = this.canvas.style.height = "100%";
+    // } else {
+    //   this.canvas.style.width = `${this.width / this.opt.ratio!}px`;
+    //   this.canvas.style.height = `${this.height / this.opt.ratio!}px`;
+    // }
 
     // Instantiate all curves based on the style
     switch (this.opt.style) {
@@ -181,12 +182,12 @@ export default class SiriWave {
     }
 
     // Attach to the container
-    this.opt.container.appendChild(this.canvas);
+    // this.opt.container.appendChild(this.canvas);
 
     // Start the animation
-    if (this.opt.autostart) {
-      this.start();
-    }
+    // if (this.opt.autostart) {
+    //   this.start();
+    // }
   }
 
   /**
@@ -252,11 +253,22 @@ export default class SiriWave {
     this.draw();
     this.phase = (this.phase + (Math.PI / 2) * this.speed) % (2 * Math.PI);
 
-    if (window.requestAnimationFrame) {
-      this.animationFrameId = window.requestAnimationFrame(this.startDrawCycle.bind(this));
-    } else {
-      this.timeoutId = setTimeout(this.startDrawCycle.bind(this), 20);
-    }
+    // if (window.requestAnimationFrame) {
+    //   this.animationFrameId = window.requestAnimationFrame(this.startDrawCycle.bind(this));
+    // } else {
+    //   this.timeoutId = setTimeout(this.startDrawCycle.bind(this), 20);
+    // }
+  }
+
+  render(time: number) {
+    this.clear();
+
+    // Interpolate values
+    this.lerp("amplitude");
+    this.lerp("speed");
+
+    this.phase = (time * this.speed) % (2 * Math.PI);
+    this.draw();
   }
 
   /* API */
@@ -286,12 +298,12 @@ export default class SiriWave {
     this.run = false;
 
     // Clear old draw cycle on stop
-    if (this.animationFrameId) {
-      window.cancelAnimationFrame(this.animationFrameId);
-    }
-    if (this.timeoutId) {
-      clearTimeout(this.timeoutId);
-    }
+    // if (this.animationFrameId) {
+    //   window.cancelAnimationFrame(this.animationFrameId);
+    // }
+    // if (this.timeoutId) {
+    //   clearTimeout(this.timeoutId);
+    // }
   }
 
   /**
